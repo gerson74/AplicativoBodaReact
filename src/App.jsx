@@ -1,20 +1,29 @@
 import { useState } from 'react'
+import { BrowserRouter as Router, Routes, Route, useNavigate } from "react-router-dom";
 import './App.css'
 import miImagen from './assets/imagenDePortada.jpg'
-import './App.css'; // ya está importado arriba
+import guests from './guests.json'
+import Invitacion from './Invitacion'
 
-function App() {
+function Home() {
   const [cedula, setCedula] = useState("");
-  const [guest, setGuest] = useState(null);
   const [notFound, setNotFound] = useState(false);
+  const navigate = useNavigate();
 
   const buscarInvitado = () => {
-    // Aquí luego conectaremos con Firebase
-    console.log("Buscando invitado con cédula:", cedula);
+    const encontrado = guests.find(g => g.cedula === cedula.trim());
+    if (encontrado) {
+      setNotFound(false);
+      navigate("/invitacion", { state: { guest: encontrado } });
+    } else {
+      setNotFound(true);
+    }
   };
+
+  const cerrarModal = () => setNotFound(false);
+
   return (
     <div className="App" style={{ position: 'relative', minHeight: '100vh', overflow: 'hidden' }}>
-      {/* Imagen de fondo */}
       <img
         src={miImagen}
         alt="Fondo"
@@ -29,7 +38,42 @@ function App() {
           filter: 'brightness(0.5) blur(2px)'
         }}
       />
-      {/* Contenido principal */}
+      {notFound && (
+        <div style={{
+          position: 'fixed',
+          top: 0, left: 0, width: '100vw', height: '100vh',
+          background: 'rgba(0,0,0,0.5)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          zIndex: 100
+        }}>
+          <div style={{
+            background: '#fff',
+            color: '#333',
+            padding: '2rem',
+            borderRadius: '16px',
+            textAlign: 'center',
+            minWidth: '250px'
+          }}>
+            <h2 style={{ marginBottom: 16 }}>Lo siento</h2>
+            <p>Documento incorrecto</p>
+            <button
+              onClick={cerrarModal}
+              style={{
+                marginTop: 24,
+                padding: '10px 24px',
+                borderRadius: '8px',
+                border: 'none',
+                background: '#ffb347',
+                color: '#333',
+                fontWeight: 700,
+                cursor: 'pointer'
+              }}
+            >
+              Cerrar
+            </button>
+          </div>
+        </div>
+      )}
       <header
         className="App-header"
         style={{
@@ -56,7 +100,7 @@ function App() {
             textAlign: 'center'
           }}
         >
-          <h1 style={{ fontFamily: 'serif', fontWeight: 700, marginBottom: 16, fontSize: 32 }}>Bienvenido a la Fiesta</h1>
+          <h1 style={{ fontFamily: 'serif', fontWeight: 700, marginBottom: 16, fontSize: 32 }}>Bienvenido a mi Boda</h1>
           <p style={{ marginBottom: 24, fontSize: 18 }}>Ingresa tu cédula para verificar tu invitación</p>
           <input
             type="text"
@@ -71,7 +115,8 @@ function App() {
               marginBottom: '16px',
               fontSize: '16px',
               outline: 'none',
-              boxSizing: 'border-box'
+              boxSizing: 'border-box',
+              background: 'rgba(156, 163, 175, 0.2)'
             }}
           />
           <button
@@ -91,13 +136,21 @@ function App() {
           >
             Buscar
           </button>
-          {notFound && (
-            <p style={{ color: '#ffb347', marginTop: 16 }}>Invitado no encontrado</p>
-          )}
         </div>
       </header>
     </div>
   );
 }
+
+function App() {
+  return (
+    <Router>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/invitacion" element={<Invitacion />} />
+      </Routes>
+    </Router>
+  );
+}
+
 export default App;
-// Aquí puedes agregar más lógica para manejar el estado del invitado y la búsqueda en Firebase                   
