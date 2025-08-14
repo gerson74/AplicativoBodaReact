@@ -1,16 +1,33 @@
 import { useLocation, useNavigate } from "react-router-dom";
+import { useState } from "react";
 import miImagen from './assets/imagenDePortada.jpg';
 
 function Invitacion() {
   const location = useLocation();
   const navigate = useNavigate();
   const guest = location.state?.guest;
+  const [mensaje, setMensaje] = useState("");
 
   if (!guest) {
-    // Si no hay invitado, vuelve al inicio
     navigate("/");
     return null;
   }
+
+  const registrarAsistencia = async (asistira) => {
+    const nuevaRespuesta = { nombre: guest.nombre, cedula: guest.cedula, respuesta: asistira ? "Sí" : "No" };
+    await fetch('http://localhost:4000/api/respuesta', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(nuevaRespuesta)
+    });
+
+    if (asistira) {
+      setMensaje("¡Te esperamos!");
+    } else {
+      setMensaje("Lamentamos no tenerte en nuestra celebración, muchas gracias por avisar.");
+      setTimeout(() => navigate("/"), 2500);
+    }
+  };
 
   return (
     <div
@@ -60,39 +77,45 @@ function Invitacion() {
           }}>
             Aquí irá un resumen de nuestro amor, una historia especial que pronto vamos a escribir juntos para compartirla contigo en este día tan importante.
           </p>
-          <div style={{ display: "flex", gap: "1rem" }}>
-            <button
-              style={{
-                padding: "12px 32px",
-                borderRadius: "8px",
-                border: "none",
-                background: "#fbbf24",
-                color: "#1e293b",
-                fontWeight: 700,
-                fontSize: "16px",
-                cursor: "pointer",
-                boxShadow: "0 2px 8px rgba(251,191,36,0.15)",
-                transition: "background 0.2s"
-              }}
-            >
-              Sí asistiré
-            </button>
-            <button
-              style={{
-                padding: "12px 32px",
-                borderRadius: "8px",
-                border: "1px solid #1e293b",
-                background: "transparent",
-                color: "#1e293b",
-                fontWeight: 700,
-                fontSize: "16px",
-                cursor: "pointer",
-                transition: "background 0.2s"
-              }}
-            >
-              No asistiré
-            </button>
-          </div>
+          {mensaje ? (
+            <div style={{ color: "#1e293b", fontWeight: 600, fontSize: 20, marginTop: 24 }}>{mensaje}</div>
+          ) : (
+            <div style={{ display: "flex", gap: "1rem" }}>
+              <button
+                style={{
+                  padding: "12px 32px",
+                  borderRadius: "8px",
+                  border: "none",
+                  background: "#fbbf24",
+                  color: "#1e293b",
+                  fontWeight: 700,
+                  fontSize: "16px",
+                  cursor: "pointer",
+                  boxShadow: "0 2px 8px rgba(251,191,36,0.15)",
+                  transition: "background 0.2s"
+                }}
+                onClick={() => registrarAsistencia(true)}
+              >
+                Sí asistiré
+              </button>
+              <button
+                style={{
+                  padding: "12px 32px",
+                  borderRadius: "8px",
+                  border: "1px solid #1e293b",
+                  background: "transparent",
+                  color: "#1e293b",
+                  fontWeight: 700,
+                  fontSize: "16px",
+                  cursor: "pointer",
+                  transition: "background 0.2s"
+                }}
+                onClick={() => registrarAsistencia(false)}
+              >
+                No asistiré
+              </button>
+            </div>
+          )}
         </div>
         {/* Imagen */}
         <div style={{

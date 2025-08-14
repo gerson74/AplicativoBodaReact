@@ -1,0 +1,12 @@
+[
+  {
+    "nombre": "Juan Pérez",
+    "cedula": "123456789",
+    "respuesta": "No"
+  },
+  {
+    "nombre": "Mateo Bernal",
+    "cedula": "3536373839",
+    "respuesta": "Sí"
+  }
+]
